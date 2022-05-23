@@ -1,5 +1,5 @@
 const express = require("express");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 require("dotenv").config();
 const app = express();
@@ -23,9 +23,18 @@ async function run() {
 			.db("tools-manufacturer")
 			.collection("tools");
 
+		//get all tools
 		app.get("/tools", async (req, res) => {
 			const query = {};
 			const result = await toolCollection.find(query).toArray();
+			res.send(result);
+		});
+
+		//get single tools
+		app.get("/tool/:id", async (req, res) => {
+			const id = req.params.id;
+			const query = { _id: ObjectId(id) };
+			const result = await toolCollection.findOne(query);
 			res.send(result);
 		});
 	} finally {
