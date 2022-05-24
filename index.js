@@ -32,7 +32,6 @@ async function run() {
 		app.put("/user/:email", async (req, res) => {
 			const email = req.params.email;
 			const user = req.body;
-			console.log(user);
 			const filter = { email: email };
 			const options = { upsert: true };
 			const updateDoc = {
@@ -51,9 +50,34 @@ async function run() {
 			res.send({ result, token });
 		});
 
+		//user update profile
+		app.put("/profile/:email", async (req, res) => {
+			console.log("hello profile");
+			const email = req.params.email;
+			const user = req.body;
+			console.log(user);
+			const filter = { email: email };
+			const options = { upsert: true };
+			const updateDoc = {
+				fullName: user.fullName,
+				image: user.image,
+				phoneNumber: user.phoneNumber,
+				addressLine1: user.addressLine1,
+				addressLine2: user.addressLine2,
+				city: user.city,
+				state: user.state,
+				postalCode: user.postalCode,
+			};
+			const result = await usersCollection.updateOne(
+				filter,
+				updateDoc,
+				options
+			);
+			res.send(result);
+		});
+
 		//get all tools
 		app.get("/products", async (req, res) => {
-			console.log("sob thik ache");
 			const query = {};
 			const result = await toolCollection.find(query).toArray();
 			res.send(result);
