@@ -103,6 +103,14 @@ async function run() {
 			res.send(result);
 		});
 
+		//get payment products
+		app.get("/payment-product/:id", async (req, res) => {
+			const id = req.params.id;
+			const query = { _id: ObjectId(id) };
+			const result = await orderCollection.findOne(query);
+			res.send(result);
+		});
+
 		//post orderInfo to database
 		app.post("/order", async (req, res) => {
 			const orderInfo = req.body;
