@@ -95,11 +95,27 @@ async function run() {
 			res.send(result);
 		});
 
+		//get user ordered data
+		app.get("/ordered-product/:email", async (req, res) => {
+			const email = req.params.email;
+			const query = { email: email };
+			const result = await orderCollection.find(query).toArray();
+			res.send(result);
+		});
+
 		//post orderInfo to database
 		app.post("/order", async (req, res) => {
 			const orderInfo = req.body;
 			console.log(orderInfo);
 			const result = await orderCollection.insertOne(orderInfo);
+			res.send(result);
+		});
+
+		// ordered product delete
+		app.delete("/order/:id", async (req, res) => {
+			const id = req.params.id;
+			const filter = { _id: ObjectId(id) };
+			const result = await orderCollection.deleteOne(filter);
 			res.send(result);
 		});
 	} finally {
