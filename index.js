@@ -2,7 +2,9 @@ const express = require("express");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 var jwt = require("jsonwebtoken");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 require("dotenv").config();
+
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -48,6 +50,21 @@ async function run() {
 		const orderCollection = client
 			.db("tools-manufacturer")
 			.collection("orders");
+
+		//payment api
+		// app.post("/create-payment-intent", verifyJWT, async (req, res) => {
+		// 	const { totalPrice } = req.body;
+		// 	const amount = totalPrice * 100;
+		// 	console.log(amount);
+		// 	const paymentIntent = await stripe.paymentIntents.create({
+		// 		amount: amount,
+		// 		currency: "usd",
+		// 		payment_method_types: ["card"],
+		// 	});
+		// 	res.send({
+		// 		clientSecret: paymentIntent.client_secret,
+		// 	});
+		// });
 
 		//user login with jwt
 		app.put("/user/:email", async (req, res) => {
@@ -121,7 +138,7 @@ async function run() {
 		});
 
 		//get payment products
-		app.get("/payment-product/:id", async (req, res) => {
+		app.get("/payment-product/:id", verifyJWT, async (req, res) => {
 			const id = req.params.id;
 			const query = { _id: ObjectId(id) };
 			const result = await orderCollection.findOne(query);
