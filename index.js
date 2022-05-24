@@ -10,6 +10,23 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+const verifyJWT = (req, res, next) => {
+	const authHeader = req.headers.authorization;
+	if (!authHeader) {
+		return res.status(401).send({ message: "Unauthorized Access" });
+	}
+
+	const token = authHeader.split(" ")[1];
+
+	jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+		if (err) {
+			return res.status(403).send({ message: "Forbidden Access" });
+		}
+		req.decoded = decoded;
+		next();
+	});
+};
+
 const uri = `mongodb+srv://tools_manufacturer_admin:RZ61uB1zmtZgxNVJ@cluster0.vtyhe.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
 	useNewUrlParser: true,
@@ -55,7 +72,7 @@ async function run() {
 		});
 
 		//user update profile
-		app.put("/profile/:email", async (req, res) => {
+		app.put("/profile/:email", verifyJWT, async (req, res) => {
 			console.log("hello profile");
 			const email = req.params.email;
 			const user = req.body;
@@ -112,7 +129,7 @@ async function run() {
 		});
 
 		//post orderInfo to database
-		app.post("/order", async (req, res) => {
+		app.post("/order", verifyJWT, async (req, res) => {
 			const orderInfo = req.body;
 			console.log(orderInfo);
 			const result = await orderCollection.insertOne(orderInfo);
@@ -120,7 +137,7 @@ async function run() {
 		});
 
 		// ordered product delete
-		app.delete("/order/:id", async (req, res) => {
+		app.delete("/order/:id", verifyJWT, async (req, res) => {
 			const id = req.params.id;
 			const filter = { _id: ObjectId(id) };
 			const result = await orderCollection.deleteOne(filter);
