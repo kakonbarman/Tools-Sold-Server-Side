@@ -28,6 +28,10 @@ async function run() {
 			.db("tools-manufacturer")
 			.collection("users");
 
+		const orderCollection = client
+			.db("tools-manufacturer")
+			.collection("orders");
+
 		//user login with jwt
 		app.put("/user/:email", async (req, res) => {
 			const email = req.params.email;
@@ -57,7 +61,7 @@ async function run() {
 			const user = req.body;
 			console.log(user);
 			const filter = { email: email };
-			const options = { upsert: true };
+			// const options = { upsert: true };
 			const updateDoc = {
 				fullName: user.fullName,
 				image: user.image,
@@ -88,6 +92,14 @@ async function run() {
 			const id = req.params.id;
 			const query = { _id: ObjectId(id) };
 			const result = await toolCollection.findOne(query);
+			res.send(result);
+		});
+
+		//post orderInfo to database
+		app.post("/order", async (req, res) => {
+			const orderInfo = req.body;
+			console.log(orderInfo);
+			const result = await orderCollection.insertOne(orderInfo);
 			res.send(result);
 		});
 	} finally {
