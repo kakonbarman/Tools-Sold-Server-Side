@@ -238,6 +238,14 @@ async function run() {
 			res.send(result);
 		});
 
+		// user delete
+		app.delete("/product/:id", verifyJWT, async (req, res) => {
+			const id = req.params.id;
+			const filter = { _id: ObjectId(id) };
+			const result = await toolCollection.deleteOne(filter);
+			res.send(result);
+		});
+
 		// ordered product delete
 		app.delete("/order/:id", verifyJWT, async (req, res) => {
 			const id = req.params.id;
