@@ -193,6 +193,11 @@ async function run() {
 			res.send({ admin: isAdmin });
 		});
 
+		app.get("/all-order", async (req, res) => {
+			const result = await orderCollection.find({}).toArray();
+			res.send(result);
+		});
+
 		//post orderInfo to database
 		app.post("/order", verifyJWT, async (req, res) => {
 			const orderInfo = req.body;
