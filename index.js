@@ -55,6 +55,20 @@ async function run() {
 			.db("tools-manufacturer")
 			.collection("reviews");
 
+		// verify admin middleware
+		const verifyAdmin = async (req, res, next) => {
+			const requester = req.decoded.email;
+			const requestAccount = await usersCollection.findOne({
+				email: requester,
+			});
+
+			if (requestAccount.role === "admin") {
+				next();
+			} else {
+				res.status(403).send({ message: "Forbidden access" });
+			}
+		};
+
 		// payment api
 		// app.post("/create-payment-intent", verifyJWT, async (req, res) => {
 		// 	const { totalPrice } = req.body;
@@ -118,6 +132,22 @@ async function run() {
 			res.send(result);
 		});
 
+		//make user to admin api
+		app.put(
+			"/user/admin/:email",
+			verifyJWT,
+			verifyAdmin,
+			async (req, res) => {
+				const email = req.params.email;
+				const filter = { email: email };
+				const updateDoc = {
+					$set: { role: "admin" },
+				};
+				const result = await usersCollection.updateOne(filter, updateDoc);
+				res.send(result);
+			}
+		);
+
 		//get all tools
 		app.get("/products", async (req, res) => {
 			const query = {};
@@ -146,6 +176,12 @@ async function run() {
 			const id = req.params.id;
 			const query = { _id: ObjectId(id) };
 			const result = await orderCollection.findOne(query);
+			res.send(result);
+		});
+
+		//get all user
+		app.get("/user", async (req, res) => {
+			const result = await usersCollection.find({}).toArray();
 			res.send(result);
 		});
 
