@@ -29,7 +29,7 @@ const verifyJWT = (req, res, next) => {
 	});
 };
 
-const uri = `mongodb+srv://tools_manufacturer_admin:RZ61uB1zmtZgxNVJ@cluster0.vtyhe.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.vtyhe.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
@@ -223,6 +223,14 @@ async function run() {
 				return res.send(result);
 			}
 			return res.send({ message: "Review Not Added" });
+		});
+
+		// user delete
+		app.delete("/user/:id", verifyJWT, async (req, res) => {
+			const id = req.params.id;
+			const filter = { _id: ObjectId(id) };
+			const result = await usersCollection.deleteOne(filter);
+			res.send(result);
 		});
 
 		// ordered product delete
