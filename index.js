@@ -108,12 +108,10 @@ async function run() {
 
 		//user update profile
 		app.put("/profile/:email", verifyJWT, async (req, res) => {
-			console.log("hello profile");
 			const email = req.params.email;
 			const user = req.body;
-			console.log(user);
 			const filter = { email: email };
-			// const options = { upsert: true };
+			const options = { upsert: true };
 			const updateDoc = {
 				$set: {
 					fullName: user.fullName,
