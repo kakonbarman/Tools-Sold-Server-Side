@@ -115,16 +115,41 @@ async function run() {
 			const filter = { email: email };
 			// const options = { upsert: true };
 			const updateDoc = {
-				fullName: user.fullName,
-				image: user.image,
-				phoneNumber: user.phoneNumber,
-				addressLine1: user.addressLine1,
-				addressLine2: user.addressLine2,
-				city: user.city,
-				state: user.state,
-				postalCode: user.postalCode,
+				$set: {
+					fullName: user.fullName,
+					image: user.image,
+					phoneNumber: user.phoneNumber,
+					addressLine1: user.addressLine1,
+					addressLine2: user.addressLine2,
+					city: user.city,
+					state: user.state,
+					postalCode: user.postalCode,
+				},
 			};
 			const result = await usersCollection.updateOne(
+				filter,
+				updateDoc,
+				options
+			);
+			res.send(result);
+		});
+
+		// update product info
+		app.put("/product/:id", verifyJWT, async (req, res) => {
+			const id = req.params.id;
+			const product = req.body;
+			console.log(product);
+			const filter = { _id: ObjectId(id) };
+			const options = { upsert: true };
+			const updateDoc = {
+				$set: {
+					name: product.productName,
+					description: product.productDescription,
+					available: product.productAvailable,
+					price: product.productPrice,
+				},
+			};
+			const result = await toolCollection.updateOne(
 				filter,
 				updateDoc,
 				options
@@ -191,6 +216,14 @@ async function run() {
 			const user = await usersCollection.findOne({ email: email });
 			const isAdmin = user.role === "admin";
 			res.send({ admin: isAdmin });
+		});
+
+		// edit product get
+		app.get("/edit-product/:id", verifyJWT, async (req, res) => {
+			const id = req.params.id;
+			const query = { _id: ObjectId(id) };
+			const result = await toolCollection.findOne(query);
+			res.send(result);
 		});
 
 		app.get("/all-order", async (req, res) => {
