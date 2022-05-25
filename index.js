@@ -51,7 +51,11 @@ async function run() {
 			.db("tools-manufacturer")
 			.collection("orders");
 
-		//payment api
+		const reviewCollection = client
+			.db("tools-manufacturer")
+			.collection("reviews");
+
+		// payment api
 		// app.post("/create-payment-intent", verifyJWT, async (req, res) => {
 		// 	const { totalPrice } = req.body;
 		// 	const amount = totalPrice * 100;
@@ -151,6 +155,30 @@ async function run() {
 			console.log(orderInfo);
 			const result = await orderCollection.insertOne(orderInfo);
 			res.send(result);
+		});
+
+		//review post to database
+		app.post("/review/:id", verifyJWT, async (req, res) => {
+			const id = req.params.id;
+			const review = req.body;
+			const filter = { _id: ObjectId(id) };
+			const options = { upsert: true };
+			const updateDoc = {
+				$set: {
+					rating: review.rating,
+				},
+			};
+			const updateReview = await orderCollection.updateOne(
+				filter,
+				updateDoc,
+				options
+			);
+
+			if (updateReview.acknowledged) {
+				const result = await reviewCollection.insertOne(review);
+				return res.send(result);
+			}
+			return res.send({ message: "Review Not Added" });
 		});
 
 		// ordered product delete
