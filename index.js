@@ -136,7 +136,6 @@ async function run() {
 		app.put("/product/:id", verifyJWT, async (req, res) => {
 			const id = req.params.id;
 			const product = req.body;
-			console.log(product);
 			const filter = { _id: ObjectId(id) };
 			const options = { upsert: true };
 			const updateDoc = {
@@ -239,7 +238,6 @@ async function run() {
 		//post orderInfo to database
 		app.post("/order", verifyJWT, async (req, res) => {
 			const orderInfo = req.body;
-			console.log(orderInfo);
 			const result = await orderCollection.insertOne(orderInfo);
 			res.send(result);
 		});
