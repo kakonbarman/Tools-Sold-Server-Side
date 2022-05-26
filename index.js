@@ -261,6 +261,13 @@ async function run() {
 			return res.send({ message: "Review Not Added" });
 		});
 
+		// post a new product
+		app.post("/new-product", verifyJWT, verifyAdmin, async (req, res) => {
+			const newProduct = req.body;
+			const result = await toolCollection.insertOne(newProduct);
+			return res.send(result);
+		});
+
 		// user delete
 		app.delete("/user/:id", verifyJWT, async (req, res) => {
 			const id = req.params.id;
