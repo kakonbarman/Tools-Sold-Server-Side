@@ -224,8 +224,15 @@ async function run() {
 			res.send(result);
 		});
 
+		//get all orders
 		app.get("/all-order", async (req, res) => {
 			const result = await orderCollection.find({}).toArray();
+			res.send(result);
+		});
+
+		// get all review
+		app.get("/all-review", async (req, res) => {
+			const result = await reviewCollection.find({}).toArray();
 			res.send(result);
 		});
 
