@@ -55,6 +55,10 @@ async function run() {
 			.db("tools-manufacturer")
 			.collection("reviews");
 
+		const paymentCollection = client
+			.db("tools-manufacturer")
+			.collection("payments");
+
 		// verify admin middleware
 		const verifyAdmin = async (req, res, next) => {
 			const requester = req.decoded.email;
@@ -82,6 +86,26 @@ async function run() {
 			res.send({
 				clientSecret: paymentIntent.client_secret,
 			});
+		});
+
+		//update payment
+		app.patch("/pay-product/:id", verifyJWT, async (req, res) => {
+			const id = req.params.id;
+			const payment = req.body;
+			const filter = { _id: ObjectId(id) };
+			const updatedDoc = {
+				$set: {
+					paid: true,
+					transactionId: payment.transactionId,
+				},
+			};
+
+			const result = await paymentCollection.insertOne(payment);
+			const updatedBooking = await orderCollection.updateOne(
+				filter,
+				updatedDoc
+			);
+			res.send(updatedBooking);
 		});
 
 		//user login with jwt
