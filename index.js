@@ -101,11 +101,28 @@ async function run() {
 			};
 
 			const result = await paymentCollection.insertOne(payment);
-			const updatedBooking = await orderCollection.updateOne(
+			const updatedPayment = await orderCollection.updateOne(
 				filter,
 				updatedDoc
 			);
-			res.send(updatedBooking);
+			res.send(updatedPayment);
+		});
+
+		//update payment
+		app.patch("/shipping-product/:id", verifyJWT, async (req, res) => {
+			const id = req.params.id;
+			const filter = { _id: ObjectId(id) };
+			const updatedDoc = {
+				$set: {
+					shipping: true,
+				},
+			};
+
+			const shippingComplited = await orderCollection.updateOne(
+				filter,
+				updatedDoc
+			);
+			res.send(shippingComplited);
 		});
 
 		//user login with jwt
