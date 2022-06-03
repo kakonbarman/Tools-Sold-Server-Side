@@ -283,6 +283,12 @@ async function run() {
 			res.send(result);
 		});
 
+		//customer subscribe
+		app.post("/subscribe", (req, res) => {
+			const email = req.body;
+			console.log("user email", email);
+		});
+
 		//review post to database
 		app.post("/review/:id", verifyJWT, async (req, res) => {
 			const id = req.params.id;
