@@ -59,6 +59,10 @@ async function run() {
 			.db("tools-manufacturer")
 			.collection("payments");
 
+		const subscribeCollection = client
+			.db("tools-manufacturer")
+			.collection("subscribes");
+
 		// verify admin middleware
 		const verifyAdmin = async (req, res, next) => {
 			const requester = req.decoded.email;
@@ -284,9 +288,24 @@ async function run() {
 		});
 
 		//customer subscribe
-		app.post("/subscribe", (req, res) => {
+		app.post("/subscribe", async (req, res) => {
 			const email = req.body;
-			console.log("user email", email);
+			const query = { email: email.email };
+			const checkSubscribe = await subscribeCollection.findOne(query);
+			console.log("check", checkSubscribe);
+			if (!checkSubscribe) {
+				const result = await subscribeCollection.insertOne(email);
+				return res.send({
+					result,
+					success: true,
+					message: "Subscribe success!",
+				});
+			} else {
+				return res.send({
+					success: false,
+					message: "you are already subscribe!",
+				});
+			}
 		});
 
 		//review post to database
